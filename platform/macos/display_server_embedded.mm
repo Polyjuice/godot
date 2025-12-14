@@ -282,7 +282,9 @@ void DisplayServerEmbedded::_mouse_update_mode() {
 		return;
 	}
 
-	EngineDebugger::get_singleton()->send_message("game_view:mouse_set_mode", { wanted_mouse_mode });
+	if (EngineDebugger::get_singleton()) {
+		EngineDebugger::get_singleton()->send_message("game_view:mouse_set_mode", { wanted_mouse_mode });
+	}
 
 	mouse_mode = wanted_mouse_mode;
 }
@@ -327,7 +329,9 @@ bool DisplayServerEmbedded::mouse_is_mode_override_enabled() const {
 void DisplayServerEmbedded::warp_mouse(const Point2i &p_position) {
 	_THREAD_SAFE_METHOD_
 	Input::get_singleton()->set_mouse_position(p_position);
-	EngineDebugger::get_singleton()->send_message("game_view:warp_mouse", { p_position });
+	if (EngineDebugger::get_singleton()) {
+		EngineDebugger::get_singleton()->send_message("game_view:warp_mouse", { p_position });
+	}
 }
 
 Point2i DisplayServerEmbedded::mouse_get_position() const {
@@ -429,9 +433,13 @@ void DisplayServerEmbedded::send_input_text(const String &p_text, WindowID p_id)
 }
 
 void DisplayServerEmbedded::send_window_event(DisplayServer::WindowEvent p_event, WindowID p_id) const {
+	print_line(vformat("DisplayServerEmbedded::send_window_event: event=%d window_id=%d", (int)p_event, (int)p_id));
 	const Callable *cb = window_event_callbacks.getptr(p_id);
 	if (cb) {
+		print_line(vformat("  -> callback found, calling it"));
 		_window_callback(*cb, int(p_event));
+	} else {
+		print_line(vformat("  -> NO CALLBACK for window_id=%d (have %d callbacks registered)", (int)p_id, window_event_callbacks.size()));
 	}
 }
 
@@ -729,14 +737,18 @@ bool DisplayServerEmbedded::can_any_window_draw() const {
 }
 
 void DisplayServerEmbedded::window_set_ime_active(const bool p_active, WindowID p_window) {
-	EngineDebugger::get_singleton()->send_message("game_view:window_set_ime_active", { p_active });
+	if (EngineDebugger::get_singleton()) {
+		EngineDebugger::get_singleton()->send_message("game_view:window_set_ime_active", { p_active });
+	}
 }
 
 void DisplayServerEmbedded::window_set_ime_position(const Point2i &p_pos, WindowID p_window) {
 	if (p_pos == ime_last_position) {
 		return;
 	}
-	EngineDebugger::get_singleton()->send_message("game_view:window_set_ime_position", { p_pos });
+	if (EngineDebugger::get_singleton()) {
+		EngineDebugger::get_singleton()->send_message("game_view:window_set_ime_position", { p_pos });
+	}
 	ime_last_position = p_pos;
 }
 
@@ -804,7 +816,9 @@ String DisplayServerEmbedded::ime_get_text() const {
 
 void DisplayServerEmbedded::cursor_set_shape(CursorShape p_shape) {
 	cursor_shape = p_shape;
-	EngineDebugger::get_singleton()->send_message("game_view:cursor_set_shape", { p_shape });
+	if (EngineDebugger::get_singleton()) {
+		EngineDebugger::get_singleton()->send_message("game_view:cursor_set_shape", { p_shape });
+	}
 }
 
 DisplayServer::CursorShape DisplayServerEmbedded::cursor_get_shape() const {
@@ -819,7 +833,9 @@ void DisplayServerEmbedded::cursor_set_custom_image(const Ref<Resource> &p_curso
 			data = image->save_png_to_buffer();
 		}
 	}
-	EngineDebugger::get_singleton()->send_message("game_view:cursor_set_custom_image", { data, p_shape, p_hotspot });
+	if (EngineDebugger::get_singleton()) {
+		EngineDebugger::get_singleton()->send_message("game_view:cursor_set_custom_image", { data, p_shape, p_hotspot });
+	}
 }
 
 void DisplayServerEmbedded::swap_buffers() {
