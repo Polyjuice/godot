@@ -206,7 +206,10 @@ DisplayServerEmbedded::DisplayServerEmbedded(const String &p_rendering_driver, W
 	ca_context = [CAContext contextWithCGSConnection:connection_id options:@{ kCAContextCIFilterBehavior : @"ignore" }];
 	ca_context.layer = layer;
 
-	{
+	print_line("DisplayServerEmbedded: CAContext created with contextId: " + itos(ca_context.contextId));
+
+	// Only send message if debugger is active (it may not be when using libgodot)
+	if (EngineDebugger::get_singleton()) {
 		Array arr = { ca_context.contextId };
 		EngineDebugger::get_singleton()->send_message("game_view:set_context_id", arr);
 	}
@@ -825,6 +828,17 @@ void DisplayServerEmbedded::swap_buffers() {
 		gl_manager->swap_buffers();
 	}
 #endif
+}
+
+uint32_t DisplayServerEmbedded::get_context_id() const {
+	if (ca_context) {
+		return ca_context.contextId;
+	}
+	return 0;
+}
+
+void *DisplayServerEmbedded::get_layer() const {
+	return (__bridge void *)layer;
 }
 
 void DisplayServerEmbeddedState::serialize(PackedByteArray &r_data) {

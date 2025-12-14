@@ -68,6 +68,30 @@ LIBGODOT_API GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, cha
  */
 LIBGODOT_API void libgodot_destroy_godot_instance(GDExtensionObjectPtr p_godot_instance);
 
+/**
+ * @name libgodot_get_embedded_context_id
+ * @since 4.6
+ *
+ * Gets the CAContext ID for the embedded display server's rendering layer.
+ * This ID can be used with CALayerHost to display Godot's rendering in a host view.
+ * Only valid when using --display-driver embedded on macOS.
+ *
+ * @return The CAContext contextId, or 0 if embedded display server is not active.
+ */
+LIBGODOT_API uint32_t libgodot_get_embedded_context_id(void);
+
+/**
+ * @name libgodot_get_embedded_layer
+ * @since 4.6
+ *
+ * Gets the CALayer pointer for the embedded display server's rendering layer.
+ * This can be used for same-process embedding by adding as a sublayer.
+ * Only valid when using --display-driver embedded on macOS.
+ *
+ * @return The CALayer pointer, or NULL if embedded display server is not active.
+ */
+LIBGODOT_API void *libgodot_get_embedded_layer(void);
+
 #ifdef __cplusplus
 }
 #endif

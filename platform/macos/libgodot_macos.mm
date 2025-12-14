@@ -32,8 +32,10 @@
 
 #include "core/extension/godot_instance.h"
 #include "main/main.h"
+#include "servers/display/display_server.h"
 
 #include "os_macos.h"
+#include "display_server_embedded.h"
 
 static OS_MacOS *os = nullptr;
 
@@ -44,6 +46,9 @@ GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], 
 
 	uint32_t remaining_args = p_argc - 1;
 	os = new OS_MacOS_NSApp(p_argv[0], remaining_args, remaining_args > 0 ? &p_argv[1] : nullptr);
+
+	// Register the embedded display driver for in-process rendering
+	DisplayServerEmbedded::register_embedded_driver();
 
 	@autoreleasepool {
 		Error err = Main::setup(p_argv[0], remaining_args, remaining_args > 0 ? &p_argv[1] : nullptr, false);
@@ -71,4 +76,22 @@ void libgodot_destroy_godot_instance(GDExtensionObjectPtr p_godot_instance) {
 		//instance = nullptr;
 		Main::cleanup();
 	}
+}
+
+uint32_t libgodot_get_embedded_context_id(void) {
+	DisplayServer *ds = DisplayServer::get_singleton();
+	if (ds && ds->get_name() == "embedded") {
+		DisplayServerEmbedded *ds_embedded = static_cast<DisplayServerEmbedded *>(ds);
+		return ds_embedded->get_context_id();
+	}
+	return 0;
+}
+
+void *libgodot_get_embedded_layer(void) {
+	DisplayServer *ds = DisplayServer::get_singleton();
+	if (ds && ds->get_name() == "embedded") {
+		DisplayServerEmbedded *ds_embedded = static_cast<DisplayServerEmbedded *>(ds);
+		return ds_embedded->get_layer();
+	}
+	return nullptr;
 }
