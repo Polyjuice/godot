@@ -92,6 +92,19 @@ LIBGODOT_API uint32_t libgodot_get_embedded_context_id(void);
  */
 LIBGODOT_API void *libgodot_get_embedded_layer(void);
 
+/**
+ * @name libgodot_set_embedded_window_size
+ * @since 4.6
+ *
+ * Sets the size of the embedded display server's window/viewport.
+ * Use this to resize the Godot rendering to match the host view's dimensions.
+ * Only valid when using --display-driver embedded.
+ *
+ * @param p_width The new width in pixels.
+ * @param p_height The new height in pixels.
+ */
+LIBGODOT_API void libgodot_set_embedded_window_size(int p_width, int p_height);
+
 #ifdef __cplusplus
 }
 #endif

@@ -95,3 +95,12 @@ void *libgodot_get_embedded_layer(void) {
 	}
 	return nullptr;
 }
+
+void libgodot_set_embedded_window_size(int p_width, int p_height) {
+	DisplayServer *ds = DisplayServer::get_singleton();
+	if (ds && ds->get_name() == "embedded") {
+		DisplayServerEmbedded *ds_embedded = static_cast<DisplayServerEmbedded *>(ds);
+		print_line(vformat("libgodot_set_embedded_window_size: %dx%d", p_width, p_height));
+		ds_embedded->_window_set_size(Size2i(p_width, p_height));
+	}
+}
